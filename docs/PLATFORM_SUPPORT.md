@@ -12,10 +12,10 @@ between operating systems.
 
 | Feature | Linux | Windows | macOS |
 |---------|-------|---------|-------|
-| Build of portable crates | Tested locally (x86_64) | CI configured, not observed yet | CI configured, not observed yet |
+| Build + clippy + automated tests | Tested locally (x86_64) and in CI | Pass in CI (x86_64-msvc) | Pass in CI (arm64) |
 | GUI (Slint, winit) | Tested under Xvfb (software renderer) | Not run | Not run |
-| Simulated discovery | Tested | Expected to work (no OS code); not run | Expected to work; not run |
-| Read-only device discovery | **Implemented** (sysfs) | **Not implemented** – UI shows explicit "not implemented" error | **Not implemented** – same |
+| Simulated discovery | Tested | Unit/UI tests pass in CI; GUI not run | Unit/UI tests pass in CI; GUI not run |
+| Read-only device discovery | **Implemented** (sysfs) | **Not implemented** – explicit error, confirmed in CI | **Not implemented** – explicit error, confirmed in CI |
 | Refuse to run GUI elevated | Implemented (`geteuid`) | Not implemented | Implemented (`geteuid`), not run |
 | Raw read / write, eject, SMART, partitioning, erase | Not implemented | Not implemented | Not implemented |
 

@@ -84,13 +84,41 @@ without the fix and pass with it**.
 
 | Item | Status |
 |------|--------|
-| Windows (build, tests, GUI, discovery) | **Not tested** — no Windows host available. CI job configured, but after pushing, the GitHub API listed **0 workflow runs** for the repository (Actions may be disabled for it), so no Windows result exists. Discovery is not implemented and reports `NotImplemented`. |
-| macOS (build, tests, GUI, discovery) | **Not tested** — same as Windows. |
+| Windows GUI and device discovery | GUI **not run** (no Windows desktop available). Discovery is not implemented; CI confirmed it reports `device discovery is not implemented for windows in this build` instead of an empty list. Build and automated tests: see §6a. |
+| macOS GUI and device discovery | GUI **not run**. Discovery not implemented; CI confirmed the explicit `not implemented for macos` error. Build and automated tests: see §6a. |
 | Linux with real USB / NVMe / SD hardware, udev by-id links | **Not tested** — only fake sysfs trees and virtio disks. |
 | Linux Wayland session, real GPU renderer | Not tested. |
 | Screen readers (Orca, Narrator, VoiceOver) | Not tested; accessibility tree checked only through Slint's testing backend. |
 | ARM64 builds | Not tested. |
 | Any write / destructive operation | Not implemented by design. |
+
+## 6a. CI results (GitHub Actions, observed 2026-11-04)
+
+GitHub Actions became active after PR #1 was merged. Both observed runs
+concluded **success**:
+
+| Run | Commit | Jobs |
+|-----|--------|------|
+| [#1](https://github.com/neramc/UDM/actions/runs/41826252860) | `main` @ `6dfd4a6` (Phase 0 code) | fmt ✓, translations ✓, clippy + test on ubuntu-latest ✓, windows-latest ✓, macos-latest ✓ |
+| [#2](https://github.com/neramc/UDM/actions/runs/41828931658) | branch @ `ebd2dea` (GPL + docs) | fmt ✓, translations ✓, cargo-deny ✓, clippy + test on ubuntu-latest ✓, windows-latest ✓, macos-latest ✓ |
+
+Details observed in the logs:
+
+- **Windows** (x86_64-pc-windows-msvc, Rust 1.99.1, run #2): clippy with
+  `-D warnings` clean; all test binaries passed, including 12 headless UI
+  tests, 11 platform tests and 26 testkit tests (the two Unix-only fake-sysfs
+  tests are compiled out). The `geteuid` root check is Unix-only, so the
+  Windows build exercised the non-Unix code path.
+- **macOS** (aarch64-apple-darwin, Rust 1.99.1, run #1): 90 tests passed
+  (10 app, 25 domain, 6 view-model, 10 UI, 11 platform, 28 testkit); the
+  Linux adapter tests are compiled out.
+- **Ubuntu**: clippy, tests and the read-only discovery example passed
+  (the test step took 8–17 min, dominated by compiling dependencies at
+  `opt-level = 2`).
+- Discovery example on Windows/macOS exits with the explicit
+  `NotImplemented` error (`continue-on-error` in CI by design).
+- CI warning: `actions/checkout@v4` targets the deprecated Node.js 20
+  runtime; update the action version.
 
 ## 7. Blockers
 
@@ -145,9 +173,8 @@ Decided on 2026-11-04 by the project owner:
 
 Next steps:
 
-1. Enable GitHub Actions for the repository (if disabled), observe the CI
-   run on Windows and macOS (including the cargo-deny job), and record the
-   results here.
+1. ~~Observe CI on Windows and macOS~~ — done (§6a). Update
+   `actions/checkout` off the deprecated Node.js 20 runtime.
 2. Enable GitHub private vulnerability reporting, which `SECURITY.md` points
    to (repository Settings → Security).
 3. Phase 1 (PRD §8): Windows and macOS read-only discovery prototypes on
