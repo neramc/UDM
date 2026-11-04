@@ -1,0 +1,71 @@
+// Design tokens for "Precision Minimalism".
+//
+// All colors, type sizes, spacing, radii and elevation used by the UI are
+// defined here. Screens and components must not hard-code styling values.
+// See docs/UX_DESIGN_SYSTEM.md for the rationale and contrast measurements.
+
+import { Palette } from "std-widgets.slint";
+
+export enum ThemeMode { system, light, dark }
+
+export global Theme {
+    // The resolved scheme follows the std-widgets palette, which itself follows
+    // the OS setting while Palette.color-scheme is `unknown` (system mode).
+    out property <bool> dark: Palette.background.to-hsv().value < 0.5;
+
+    // Surfaces
+    out property <color> canvas: dark ? #0f1115 : #f4f5f7;
+    out property <color> surface: dark ? #171a20 : #ffffff;
+    out property <color> surface-sunken: dark ? #13161b : #eef0f3;
+    out property <color> surface-hover: dark ? #1d2128 : #f0f2f5;
+    out property <color> surface-selected: dark ? #1b2433 : #e8f0fe;
+    out property <color> border: dark ? #2b313b : #d9dde3;
+    out property <color> border-strong: dark ? #3a414d : #b9c0ca;
+
+    // Text
+    out property <color> text-primary: dark ? #e8ebf0 : #14171c;
+    out property <color> text-secondary: dark ? #b4bcc8 : #4a5260;
+    out property <color> text-tertiary: dark ? #8f99a8 : #626b78;
+
+    // Interaction
+    out property <color> accent: dark ? #7aa7ff : #1f5fd1;
+    out property <color> focus-ring: accent;
+
+    // Status tones. Always paired with text; color is never the only signal.
+    out property <color> tone-positive: dark ? #4cc38a : #1e7a46;
+    out property <color> tone-caution: dark ? #e0a33a : #8a5a00;
+    out property <color> tone-negative: dark ? #ff8a7e : #b42318;
+    out property <color> tone-neutral: dark ? #a3adbb : #545d6b;
+    out property <color> tone-info: dark ? #5cc8dd : #0e6a85;
+    // Reserved for destructive actions (none exist in Phase 0).
+    out property <color> destructive: tone-negative;
+
+    // Typography
+    out property <length> font-caption: 12px;
+    out property <length> font-body: 14px;
+    out property <length> font-title: 16px;
+    out property <length> font-heading: 20px;
+    out property <int> weight-regular: 400;
+    out property <int> weight-strong: 600;
+
+    // Spacing scale
+    out property <length> space-1: 4px;
+    out property <length> space-2: 8px;
+    out property <length> space-3: 12px;
+    out property <length> space-4: 16px;
+    out property <length> space-5: 24px;
+    out property <length> space-6: 32px;
+
+    // Radii
+    out property <length> radius-sm: 4px;
+    out property <length> radius-md: 8px;
+
+    // Elevation: borders instead of shadows for in-page surfaces.
+    out property <length> stroke: 1px;
+    out property <length> focus-stroke: 2px;
+
+    // Layout
+    out property <length> sidebar-width: 360px;
+    out property <length> label-column: 168px;
+    out property <length> provenance-column: 220px;
+}

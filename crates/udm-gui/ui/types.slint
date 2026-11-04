@@ -1,0 +1,98 @@
+// Data types exchanged between Rust view models and the UI.
+// Enum values are mapped to localized text in labels.slint; Rust never sends
+// user-facing prose for these, so every label can be translated.
+
+export enum TransportKind { usb, nvme, ata, scsi, mmc, virtio, unknown }
+export enum MediaKind { present, no-media, unknown }
+export enum WriteProtectKind { writable, read-only, unknown }
+export enum SystemDiskKind { system, not-system, unknown }
+export enum RemovableKind { yes, no, unknown }
+
+export enum CapabilityKind {
+    raw-read, raw-write, safe-eject, smart-access, partition-edit, secure-erase, filesystem-check
+}
+export enum CapabilityState { supported, limited, unavailable, not-tested }
+export enum ReasonCode {
+    none, not-assessed, not-implemented, requires-helper, permission-denied, write-protected,
+    no-media, transport-unsupported, bridge-unverified, flash-erasure-not-guaranteed
+}
+
+export enum AttributeName {
+    vendor, model, revision, serial-number, world-wide-name, usb-vendor-id, usb-product-id,
+    usb-manufacturer, usb-product, usb-serial-number, capacity, logical-block-size,
+    physical-block-size, persistent-link, os-device-name, os-device-number
+}
+export enum ConfidenceLevel { low, medium, high }
+export enum SourceKind { simulated, linux-sysfs, linux-udev-link }
+
+export enum UsageKind { mounted, swap, held }
+export enum IssueCode {
+    probe-failed, duplicate-identifier, no-strong-identifier, system-disk-undetermined,
+    virtual-devices-excluded
+}
+
+export enum ScreenState { loading, ready, failed }
+export enum FailureCode { not-implemented, permission-denied, io, simulated, adapter-panicked, worker-stopped }
+
+export struct AttributeRow {
+    name: AttributeName,
+    value: string,
+    source: SourceKind,
+    locator: string,
+    confidence: ConfidenceLevel,
+}
+
+export struct CapabilityRow {
+    capability: CapabilityKind,
+    state: CapabilityState,
+    reason: ReasonCode,
+    destructive: bool,
+}
+
+export struct UsageItem {
+    kind: UsageKind,
+    // Mount point / holder name: technical, not translated.
+    detail: string,
+    // Filesystem type and stacked device, technical, may be empty.
+    extra: string,
+}
+
+export struct PartitionRow {
+    number: string,
+    os-name: string,
+    start: string,
+    size: string,
+    usage: [UsageItem],
+}
+
+export struct IssueRow {
+    code: IssueCode,
+    // false for informational notes.
+    warning: bool,
+    // Technical detail (identifiers, counts); not translated.
+    detail: string,
+    device: string,
+}
+
+export struct DeviceItem {
+    key: string,
+    // Vendor and model as reported; empty when nothing was reported.
+    title: string,
+    os-name: string,
+    capacity: string,
+    capacity-detail: string,
+    transport: TransportKind,
+    simulated: bool,
+    media: MediaKind,
+    write-protect: WriteProtectKind,
+    removable: RemovableKind,
+    system-disk: SystemDiskKind,
+    in-use: bool,
+    strong-identity: bool,
+    block-size: string,
+    attributes: [AttributeRow],
+    partitions: [PartitionRow],
+    whole-disk-usage: [UsageItem],
+    capabilities: [CapabilityRow],
+    issues: [IssueRow],
+}
