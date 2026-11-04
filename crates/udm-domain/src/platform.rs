@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Operating-system identification used in reports and capability reasons.
 
 /// The operating-system family an observation or adapter belongs to.

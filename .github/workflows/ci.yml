@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 name: CI
 
 on:
@@ -44,6 +47,15 @@ jobs:
       # Read-only discovery smoke run. Never performs any write.
       - run: cargo run --locked -p udm-platform --example discover
         continue-on-error: ${{ runner.os != 'Linux' }}
+
+  dependencies:
+    name: licenses + advisories (cargo-deny)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check
 
   translations:
     runs-on: ubuntu-latest

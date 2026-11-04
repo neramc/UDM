@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Minimal positional block I/O interface used by the harness.
 //!
 //! This trait exists so that fault injection ([`crate::FaultyDisk`]) can wrap

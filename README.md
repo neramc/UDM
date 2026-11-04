@@ -34,6 +34,7 @@ cargo run -p udm-platform --example discover
 cargo fmt --all --check
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
+cargo deny check            # license and advisory policy (cargo install cargo-deny)
 ```
 
 ## Documentation
@@ -44,9 +45,20 @@ cargo test --workspace
 - [Testing strategy](docs/TESTING_STRATEGY.md)
 - [UX design system](docs/UX_DESIGN_SYSTEM.md)
 - [Phase 0 test report](docs/PHASE0_TEST_REPORT.md)
+- [Product requirements](docs/PRD.md)
+- [Contributing](CONTRIBUTING.md) · [Security policy](SECURITY.md)
 - Project rules for contributors and AI assistants: [CLAUDE.md](CLAUDE.md)
 
 ## License
 
-Not chosen yet — see [ADR-0002](docs/ADR/0002-gui-toolkit-slint.md) for the
-options and their implications with Slint's licensing.
+Copyright (C) 2026 Universal Drive Manager contributors.
+
+Universal Drive Manager is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version. It is distributed WITHOUT ANY WARRANTY. See
+[`LICENSE`](LICENSE) for the full text.
+
+The GUI uses [Slint](https://slint.dev) under its GPL-3.0-only option, so
+distributed binaries are governed by GPLv3. Details and dependency license
+policy: [ADR-0002](docs/ADR/0002-gui-toolkit-slint.md).

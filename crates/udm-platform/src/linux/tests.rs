@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Tests for the Linux sysfs adapter against fake `/sys` trees.
 
 use std::path::Path;

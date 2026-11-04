@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Tests for the background discovery service.
 
 use std::sync::mpsc::{self, Receiver};

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Test harness for Universal Drive Manager.
 //!
 //! Everything in this crate operates on **temporary files and directories

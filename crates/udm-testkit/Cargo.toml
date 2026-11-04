@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 [package]
 name = "udm-testkit"
 description = "Virtual-disk fixtures, fault injection and fake sysfs trees for Universal Drive Manager tests. Never touches physical devices."
@@ -5,6 +8,8 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [dependencies]
 tempfile.workspace = true

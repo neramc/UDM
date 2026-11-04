@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Writes MBR and GPT virtual-disk fixtures into a directory so they can be
 //! cross-checked with independent tools (e.g. `fdisk -l`, `sfdisk --json`).
 //!

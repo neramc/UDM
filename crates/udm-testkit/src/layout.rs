@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Partition-table writers for virtual disks.
 //!
 //! These produce well-formed MBR and GPT layouts so that future partition

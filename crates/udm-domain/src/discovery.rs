@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Discovery results and typed issues.
 //!
 //! Discovery is allowed to partially fail: one unreadable attribute must not

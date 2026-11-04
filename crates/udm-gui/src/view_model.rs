@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Conversion of domain data into UI view models.
 //!
 //! Only technical, non-translatable values (numbers, identifiers, mount

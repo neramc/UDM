@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Platform-independent domain model for Universal Drive Manager.
 //!
 //! This crate must not depend on Slint, on operating-system APIs, or on any I/O.

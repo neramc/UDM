@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Applies discovery events to the main window.
 //!
 //! The presenter runs on the GUI thread only. It receives events that the

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 [package]
 name = "udm-gui"
 description = "Slint desktop GUI for Universal Drive Manager."
@@ -5,6 +8,8 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [[bin]]
 name = "udm"

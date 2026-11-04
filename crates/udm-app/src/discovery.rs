@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Background device discovery.
 //!
 //! [`DiscoveryService`] owns one worker thread and one adapter at a time.

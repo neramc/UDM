@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
 """Regenerates crates/udm-gui/lang/ko/LC_MESSAGES/udm-gui.po.
 
 Extracts every @tr("...") string from crates/udm-gui/ui/*.slint (no
@@ -151,6 +153,20 @@ KO = {
     "Discovery failed": "검색 실패",
     "Discovery complete": "검색 완료",
     "No telemetry is collected.": "원격 측정 데이터를 수집하지 않습니다.",
+    "About": "정보",
+    "Version, license and source code": "버전, 라이선스, 소스 코드",
+    "About Universal Drive Manager": "Universal Drive Manager 정보",
+    "Version {}": "버전 {}",
+    "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.":
+        "이 프로그램은 자유 소프트웨어입니다. 자유 소프트웨어 재단이 공표한 GNU 일반 공중 사용 허가서(GPL) 버전 3 또는 (선택에 따라) 그 이후 버전의 조건에 따라 재배포하거나 수정할 수 있습니다.",
+    "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.":
+        "이 프로그램은 유용하게 쓰이기를 바라며 배포되지만, 상품성이나 특정 목적 적합성에 대한 묵시적 보증을 포함하여 어떠한 보증도 제공하지 않습니다. 자세한 내용은 GNU 일반 공중 사용 허가서를 참고하세요.",
+    "A copy of the license is included in the LICENSE file distributed with this program and is available at {}.":
+        "허가서 사본은 이 프로그램과 함께 배포되는 LICENSE 파일에 포함되어 있으며, {}에서도 볼 수 있습니다.",
+    "Source code: {}": "소스 코드: {}",
+    "The user interface is built with Slint, used under the GNU General Public License version 3.":
+        "사용자 인터페이스는 GNU 일반 공중 사용 허가서 버전 3에 따라 사용하는 Slint로 만들어졌습니다.",
+    "Close": "닫기",
 }
 
 

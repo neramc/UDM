@@ -1,0 +1,85 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+// About dialog with the "Appropriate Legal Notices" required by GPLv3
+// sections 0 and 5(d): copyright notice, absence of warranty, the license
+// terms, and how to view a copy of the license.
+
+import { Button } from "std-widgets.slint";
+import { Theme } from "theme.slint";
+import { Caption, Body } from "components.slint";
+
+export component AboutDialog inherits Rectangle {
+    in property <string> version;
+    in property <string> source-url;
+    callback close();
+
+    background: Theme.scrim;
+
+    // Makes the dashboard behind the dialog inert while it is open.
+    TouchArea { }
+
+    keys := FocusScope {
+        key-pressed(event) => {
+            if event.text == Key.Escape {
+                root.close();
+                return accept;
+            }
+            return reject;
+        }
+    }
+
+    dialog := Rectangle {
+        width: min(600px, root.width - 2 * Theme.space-5);
+        height: content.preferred-height;
+        x: (root.width - self.width) / 2;
+        y: (root.height - self.height) / 2;
+        background: Theme.surface;
+        border-radius: Theme.radius-md;
+        border-width: Theme.stroke;
+        border-color: Theme.border-strong;
+        drop-shadow-blur: Theme.dialog-shadow-blur;
+        drop-shadow-color: Theme.dialog-shadow;
+        accessible-role: AccessibleRole.groupbox;
+        accessible-label: @tr("About Universal Drive Manager");
+
+        content := VerticalLayout {
+            padding: Theme.space-5;
+            spacing: Theme.space-3;
+            Text {
+                text: @tr("About Universal Drive Manager");
+                font-size: Theme.font-heading;
+                font-weight: Theme.weight-strong;
+                color: Theme.text-primary;
+                wrap: word-wrap;
+            }
+            Caption { text: @tr("Version {}", root.version); }
+            // Legal notice; intentionally not translated.
+            Body { text: "Copyright (C) 2026 Universal Drive Manager contributors"; }
+            Body {
+                text: @tr("This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.");
+            }
+            Body {
+                text: @tr("This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.");
+            }
+            Body {
+                text: @tr("A copy of the license is included in the LICENSE file distributed with this program and is available at {}.", "https://www.gnu.org/licenses/gpl-3.0.html");
+            }
+            Body { text: @tr("Source code: {}", root.source-url); }
+            Caption {
+                text: @tr("The user interface is built with Slint, used under the GNU General Public License version 3.");
+            }
+            HorizontalLayout {
+                alignment: end;
+                Button {
+                    text: @tr("Close");
+                    clicked => { root.close(); }
+                }
+            }
+        }
+    }
+
+    init => {
+        keys.focus();
+    }
+}

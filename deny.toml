@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# cargo-deny policy: `cargo deny check` (see CONTRIBUTING.md).
+# The project is GPL-3.0-or-later; every dependency must be compatible with
+# GPLv3. Slint is triple-licensed and is used under its GPL-3.0-only option,
+# so its proprietary "LicenseRef-Slint-*" alternatives are deliberately not
+# allowed here.
+
+[graph]
+targets = [
+    "x86_64-unknown-linux-gnu",
+    "aarch64-unknown-linux-gnu",
+    "x86_64-pc-windows-msvc",
+    "aarch64-pc-windows-msvc",
+    "x86_64-apple-darwin",
+    "aarch64-apple-darwin",
+]
+
+[licenses]
+allow = [
+    "GPL-3.0-or-later",
+    "GPL-3.0-only",
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "BSL-1.0",
+    "ISC",
+    "Zlib",
+    "Unicode-3.0",
+    "0BSD",
+    "CC0-1.0",
+    "Unlicense",
+]
+confidence-threshold = 0.93
+
+[advisories]
+# Unmaintained crates are reported but do not fail the build; vulnerabilities do.
+unmaintained = "workspace"
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+allow-wildcard-paths = true
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Simulated device discovery.
 //!
 //! The simulator produces devices that **do not exist**. Every device it

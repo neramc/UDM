@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! CRC-32 (IEEE 802.3, reflected, polynomial `0xEDB88320`) as used by GPT.
 //!
 //! A tiny bitwise implementation is sufficient for test fixtures and avoids a

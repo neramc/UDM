@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Universal Drive Manager — Phase 0 dashboard (read-only).
 
 import { Button, ComboBox, ScrollView, Palette } from "std-widgets.slint";
@@ -10,6 +13,7 @@ import {
     Badge, SectionTitle, Caption, Body, KeyValue, Card, StateBadges, DeviceCard, CapabilityLine,
     AttributeLine, UsageText, IssueLine, StateMessage
 } from "components.slint";
+import { AboutDialog } from "about.slint";
 
 export { Theme, ThemeMode, Labels }
 export * from "types.slint";
@@ -23,6 +27,7 @@ component Header inherits Rectangle {
     callback source-selected(int);
     callback theme-selected(int);
     callback language-selected(int);
+    callback about();
 
     background: Theme.surface;
     height: layout.preferred-height;
@@ -99,6 +104,14 @@ component Header inherits Rectangle {
                 current-index <=> root.language-index;
                 accessible-label: @tr("Language");
                 selected => { root.language-selected(self.current-index); }
+            }
+        }
+        VerticalLayout {
+            alignment: end;
+            Button {
+                text: @tr("About");
+                accessible-description: @tr("Version, license and source code");
+                clicked => { root.about(); }
             }
         }
     }
@@ -361,6 +374,9 @@ export component MainWindow inherits Window {
     in-out property <int> source-index: 0;
     in-out property <int> theme-index: 0;
     in-out property <int> language-index: 0;
+    in-out property <bool> about-open: false;
+    in property <string> app-version;
+    in property <string> source-url;
 
     callback refresh();
     callback source-changed(int);
@@ -381,6 +397,7 @@ export component MainWindow inherits Window {
             source-selected(index) => { root.source-changed(index); }
             theme-selected(index) => { root.apply-theme(index); }
             language-selected(index) => { root.language-changed(index); }
+            about => { root.about-open = true; }
         }
         Notice { simulated: root.source-simulated; }
 
@@ -453,5 +470,15 @@ export component MainWindow inherits Window {
                 Caption { text: @tr("No telemetry is collected."); }
             }
         }
+    }
+
+    if root.about-open: AboutDialog {
+        x: 0;
+        y: 0;
+        width: root.width;
+        height: root.height;
+        version: root.app-version;
+        source-url: root.source-url;
+        close => { root.about-open = false; }
     }
 }

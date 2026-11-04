@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Fake Linux `/sys`, `/dev` and `/proc` trees for discovery tests.
 //!
 //! The layout mirrors the parts of the real kernel interfaces that the Linux

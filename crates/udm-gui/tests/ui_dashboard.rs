@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Headless UI tests for the Phase 0 dashboard.
 //!
 //! They use Slint's testing backend (no window system, no rendering) and the
@@ -294,4 +297,52 @@ fn korean_translation_is_bundled() {
     assert!(!all.iter().any(|t| t == "Data source"));
     slint::select_bundled_translation("en").expect("English is always available");
     assert!(texts(&ui).iter().any(|t| t == "Data source"));
+}
+
+#[test]
+fn about_dialog_shows_gpl_legal_notices_and_closes_with_escape() {
+    let ui = window();
+    ui.set_app_version("0.0.1".into());
+    ui.set_source_url("https://github.com/neramc/UDM".into());
+    assert!(!ui.get_about_open());
+
+    let about = ElementHandle::find_by_accessible_label(&ui, "About")
+        .next()
+        .expect("About button is exposed to accessibility");
+    about.invoke_accessible_default_action();
+    assert!(ui.get_about_open());
+
+    // GPLv3 "Appropriate Legal Notices": copyright, no warranty, license
+    // terms and how to view a copy.
+    let all = texts(&ui);
+    let has = |needle: &str| all.iter().any(|t| t.contains(needle));
+    assert!(has(
+        "Copyright (C) 2026 Universal Drive Manager contributors"
+    ));
+    assert!(has("WITHOUT ANY WARRANTY"));
+    assert!(has(
+        "GNU General Public License as published by the Free Software Foundation, either version 3"
+    ));
+    assert!(has("https://www.gnu.org/licenses/gpl-3.0.html"));
+    assert!(has("Source code: https://github.com/neramc/UDM"));
+    assert!(has("Version 0.0.1"));
+
+    ui.window().dispatch_event(WindowEvent::KeyPressed {
+        text: Key::Escape.into(),
+    });
+    ui.window().dispatch_event(WindowEvent::KeyReleased {
+        text: Key::Escape.into(),
+    });
+    assert!(!ui.get_about_open(), "Escape closes the dialog");
+}
+
+#[test]
+fn about_dialog_close_button_closes_it() {
+    let ui = window();
+    ui.set_about_open(true);
+    let close = ElementHandle::find_by_accessible_label(&ui, "Close")
+        .next()
+        .expect("Close button is exposed to accessibility");
+    close.invoke_accessible_default_action();
+    assert!(!ui.get_about_open());
 }

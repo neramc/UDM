@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Design tokens for "Precision Minimalism".
 //
 // All colors, type sizes, spacing, radii and elevation used by the UI are
@@ -60,9 +63,13 @@ export global Theme {
     out property <length> radius-sm: 4px;
     out property <length> radius-md: 8px;
 
-    // Elevation: borders instead of shadows for in-page surfaces.
+    // Elevation: borders instead of shadows for in-page surfaces; only
+    // dialogs float above the page.
     out property <length> stroke: 1px;
     out property <length> focus-stroke: 2px;
+    out property <color> scrim: dark ? #000000a6 : #0f111566;
+    out property <color> dialog-shadow: dark ? #00000099 : #0f111533;
+    out property <length> dialog-shadow-blur: 24px;
 
     // Layout
     out property <length> sidebar-width: 360px;

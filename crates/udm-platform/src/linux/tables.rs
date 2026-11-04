@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Parsers for `/proc/self/mountinfo` and `/proc/swaps`.
 //!
 //! Both parsers are pure functions over text so they can be tested without a

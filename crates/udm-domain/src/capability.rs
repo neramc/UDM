@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Explicit capability model.
 //!
 //! Every [`Capability`] of every device has a [`CapabilityStatus`]. The four

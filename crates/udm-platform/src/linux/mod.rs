@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Read-only Linux device discovery via sysfs.
 //!
 //! This adapter only *reads* world-readable kernel interfaces:

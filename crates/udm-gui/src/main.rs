@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Universal Drive Manager desktop application (Phase 0, read-only).
 
 use std::cell::RefCell;
@@ -94,6 +97,8 @@ fn select_language(ui: &MainWindow, index: i32) {
 
 fn run() -> Result<(), StartupError> {
     let ui = MainWindow::new().map_err(StartupError::Ui)?;
+    ui.set_app_version(env!("CARGO_PKG_VERSION").into());
+    ui.set_source_url(env!("CARGO_PKG_REPOSITORY").into());
     select_language(&ui, i32::from(initial_language() == "ko"));
 
     let weak = ui.as_weak();

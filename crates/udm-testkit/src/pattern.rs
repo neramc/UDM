@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Deterministic data patterns for write / verify tests.
 //!
 //! Patterns are generated and checked in bounded chunks so that tests exercise

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Platform adapters for Universal Drive Manager.
 //!
 //! Every adapter implements [`DeviceDiscovery`], a **read-only** port: Phase 0

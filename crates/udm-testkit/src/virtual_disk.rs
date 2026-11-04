@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 //! Sparse, fixed-capacity, file-backed virtual disks.
 
 use std::fs::{File, OpenOptions};

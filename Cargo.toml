@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Universal Drive Manager contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 [workspace]
 resolver = "3"
 members = [
@@ -13,9 +16,10 @@ version = "0.0.1"
 edition = "2024"
 rust-version = "1.92"
 publish = false
-# NOTE: The project license has not been chosen yet. See docs/ADR/0002-gui-toolkit-slint.md
-# and docs/PHASE0_TEST_REPORT.md ("Unresolved questions"). Do not add a `license` field
-# until the project owner decides.
+# Decided in docs/ADR/0002-gui-toolkit-slint.md. Slint is used under its GPL-3.0-only
+# option, so distributed binaries are governed by GPLv3 terms.
+license = "GPL-3.0-or-later"
+repository = "https://github.com/neramc/UDM"
 
 [workspace.dependencies]
 udm-domain = { path = "crates/udm-domain" }
