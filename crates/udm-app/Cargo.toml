@@ -1,0 +1,16 @@
+[package]
+name = "udm-app"
+description = "Application layer for Universal Drive Manager: use cases, background workers and discovery orchestration."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+udm-domain.workspace = true
+udm-platform.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[lints]
+workspace = true

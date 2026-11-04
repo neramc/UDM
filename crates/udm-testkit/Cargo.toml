@@ -1,0 +1,13 @@
+[package]
+name = "udm-testkit"
+description = "Virtual-disk fixtures, fault injection and fake sysfs trees for Universal Drive Manager tests. Never touches physical devices."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

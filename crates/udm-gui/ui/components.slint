@@ -1,0 +1,266 @@
+// Reusable components. All styling comes from Theme tokens.
+
+import { Theme } from "theme.slint";
+import { Labels } from "labels.slint";
+import {
+    DeviceItem, CapabilityRow, AttributeRow, UsageItem, IssueRow, SystemDiskKind, MediaKind,
+    WriteProtectKind
+} from "types.slint";
+
+// A compact status label. Color reinforces the text, never replaces it.
+export component Badge inherits Rectangle {
+    in property <string> text;
+    in property <color> tone: Theme.tone-neutral;
+    height: 22px;
+    border-radius: Theme.radius-sm;
+    background: tone.transparentize(0.88);
+    border-width: Theme.stroke;
+    border-color: tone.transparentize(0.55);
+    accessible-role: AccessibleRole.text;
+    accessible-label: root.text;
+    HorizontalLayout {
+        padding-left: Theme.space-2;
+        padding-right: Theme.space-2;
+        Text {
+            text: root.text;
+            color: root.tone;
+            font-size: Theme.font-caption;
+            font-weight: Theme.weight-strong;
+            vertical-alignment: center;
+            accessible-role: AccessibleRole.none;
+        }
+    }
+}
+
+export component SectionTitle inherits Text {
+    font-size: Theme.font-title;
+    font-weight: Theme.weight-strong;
+    color: Theme.text-primary;
+}
+
+export component Caption inherits Text {
+    font-size: Theme.font-caption;
+    color: Theme.text-tertiary;
+    wrap: word-wrap;
+}
+
+export component Body inherits Text {
+    font-size: Theme.font-body;
+    color: Theme.text-primary;
+    wrap: word-wrap;
+}
+
+// A labelled value in a two-column layout.
+export component KeyValue inherits HorizontalLayout {
+    in property <string> label;
+    in property <string> value;
+    in property <color> value-color: Theme.text-primary;
+    spacing: Theme.space-3;
+    Text {
+        width: Theme.label-column;
+        text: root.label;
+        color: Theme.text-secondary;
+        font-size: Theme.font-body;
+        wrap: word-wrap;
+    }
+    Text {
+        horizontal-stretch: 1;
+        text: root.value;
+        color: root.value-color;
+        font-size: Theme.font-body;
+        wrap: word-wrap;
+    }
+}
+
+// A bordered surface used for detail sections.
+export component Card inherits Rectangle {
+    background: Theme.surface;
+    border-radius: Theme.radius-md;
+    border-width: Theme.stroke;
+    border-color: Theme.border;
+}
+
+export component StateBadges inherits HorizontalLayout {
+    in property <DeviceItem> device;
+    spacing: Theme.space-1 + 2px;
+    alignment: start;
+    Badge { text: Labels.transport(root.device.transport); }
+    if root.device.simulated: Badge { text: @tr("Simulated"); tone: Theme.tone-info; }
+    if root.device.system-disk == SystemDiskKind.system: Badge { text: @tr("System disk"); tone: Theme.tone-caution; }
+    if root.device.system-disk == SystemDiskKind.unknown: Badge { text: @tr("System use unknown"); tone: Theme.tone-caution; }
+    if root.device.media == MediaKind.no-media: Badge { text: @tr("No media"); tone: Theme.tone-neutral; }
+    if root.device.write-protect == WriteProtectKind.read-only: Badge { text: @tr("Write-protected"); tone: Theme.tone-neutral; }
+    if root.device.in-use: Badge { text: @tr("In use"); tone: Theme.tone-neutral; }
+}
+
+// One entry of the device list.
+export component DeviceCard inherits Rectangle {
+    in property <DeviceItem> device;
+    in property <bool> selected;
+    in property <bool> list-focused;
+    callback activated();
+
+    min-height: 76px;
+    border-radius: Theme.radius-md;
+    background: selected ? Theme.surface-selected : touch.has-hover ? Theme.surface-hover : Theme.surface;
+    border-width: selected && list-focused ? Theme.focus-stroke : Theme.stroke;
+    border-color: selected ? Theme.accent : Theme.border;
+
+    accessible-role: list-item;
+    accessible-label: (root.device.title != "" ? root.device.title : @tr("Unidentified device")) + ", " + root.device.capacity;
+    accessible-item-selectable: true;
+    accessible-item-selected: root.selected;
+    accessible-action-default => { root.activated(); }
+
+    touch := TouchArea {
+        mouse-cursor: pointer;
+        clicked => { root.activated(); }
+    }
+
+    VerticalLayout {
+        padding: Theme.space-3;
+        spacing: Theme.space-2;
+        HorizontalLayout {
+            spacing: Theme.space-2;
+            Text {
+                horizontal-stretch: 1;
+                text: root.device.title != "" ? root.device.title : @tr("Unidentified device");
+                color: root.device.title != "" ? Theme.text-primary : Theme.text-secondary;
+                font-size: Theme.font-body;
+                font-weight: Theme.weight-strong;
+                overflow: elide;
+            }
+            // OS name (e.g. sdb) helps people match the card to OS tools.
+            if root.device.os-name != "": Text {
+                text: root.device.os-name;
+                color: Theme.text-tertiary;
+                font-size: Theme.font-caption;
+                vertical-alignment: center;
+            }
+            Text {
+                text: root.device.capacity != "" ? root.device.capacity : @tr("Size unknown");
+                color: Theme.text-secondary;
+                font-size: Theme.font-body;
+            }
+        }
+        StateBadges { device: root.device; }
+    }
+}
+
+export component CapabilityLine inherits HorizontalLayout {
+    in property <CapabilityRow> entry;
+    spacing: Theme.space-3;
+    padding-top: Theme.space-1;
+    padding-bottom: Theme.space-1;
+    Text {
+        width: Theme.label-column;
+        text: Labels.capability(root.entry.capability) + (root.entry.destructive ? " *" : "");
+        color: Theme.text-primary;
+        font-size: Theme.font-body;
+        vertical-alignment: center;
+    }
+    HorizontalLayout {
+        width: 108px;
+        alignment: start;
+        Badge {
+            text: Labels.capability-state(root.entry.state);
+            tone: Labels.capability-tone(root.entry.state);
+        }
+    }
+    Text {
+        horizontal-stretch: 1;
+        text: Labels.reason(root.entry.reason);
+        color: Theme.text-secondary;
+        font-size: Theme.font-body;
+        wrap: word-wrap;
+        vertical-alignment: center;
+    }
+}
+
+export component AttributeLine inherits HorizontalLayout {
+    in property <AttributeRow> entry;
+    spacing: Theme.space-3;
+    padding-top: Theme.space-1;
+    padding-bottom: Theme.space-1;
+    Text {
+        width: Theme.label-column;
+        text: Labels.attribute(root.entry.name);
+        color: Theme.text-secondary;
+        font-size: Theme.font-body;
+    }
+    Text {
+        horizontal-stretch: 1;
+        min-width: 0;
+        text: root.entry.value;
+        color: Theme.text-primary;
+        font-size: Theme.font-body;
+        wrap: word-wrap;
+    }
+    // Fixed width so the provenance column lines up across rows.
+    Text {
+        width: Theme.provenance-column;
+        text: Labels.source(root.entry.source) + (root.entry.locator != "" ? " · " + root.entry.locator : "");
+        color: Theme.text-tertiary;
+        font-size: Theme.font-caption;
+        wrap: word-wrap;
+        vertical-alignment: center;
+    }
+    HorizontalLayout {
+        width: 140px;
+        alignment: end;
+        Badge {
+            text: Labels.confidence(root.entry.confidence);
+            tone: Labels.confidence-tone(root.entry.confidence);
+        }
+    }
+}
+
+export component UsageText inherits Text {
+    in property <UsageItem> item;
+    text: Labels.usage(root.item.kind) + (root.item.detail != "" ? ": " + root.item.detail : "") + (root.item.extra != "" ? " (" + root.item.extra + ")" : "");
+    color: Theme.text-primary;
+    font-size: Theme.font-body;
+    wrap: word-wrap;
+}
+
+export component IssueLine inherits HorizontalLayout {
+    in property <IssueRow> entry;
+    spacing: Theme.space-2;
+    Rectangle {
+        width: 3px;
+        background: root.entry.warning ? Theme.tone-caution : Theme.tone-neutral;
+        border-radius: 1px;
+    }
+    VerticalLayout {
+        spacing: 2px;
+        Body { text: Labels.issue(root.entry.code); }
+        if root.entry.detail != "" || root.entry.device != "": Caption {
+            text: root.entry.device + (root.entry.device != "" && root.entry.detail != "" ? " · " : "") + root.entry.detail;
+        }
+    }
+}
+
+// Centered message for empty, loading, failed and unselected states.
+export component StateMessage inherits VerticalLayout {
+    in property <string> title;
+    in property <string> body;
+    alignment: center;
+    spacing: Theme.space-2;
+    padding: Theme.space-5;
+    Text {
+        text: root.title;
+        horizontal-alignment: center;
+        font-size: Theme.font-title;
+        font-weight: Theme.weight-strong;
+        color: Theme.text-primary;
+        wrap: word-wrap;
+    }
+    if root.body != "": Text {
+        text: root.body;
+        horizontal-alignment: center;
+        font-size: Theme.font-body;
+        color: Theme.text-secondary;
+        wrap: word-wrap;
+    }
+    @children
+}

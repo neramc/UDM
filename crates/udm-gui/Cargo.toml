@@ -1,0 +1,32 @@
+[package]
+name = "udm-gui"
+description = "Slint desktop GUI for Universal Drive Manager."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "udm"
+path = "src/main.rs"
+
+[dependencies]
+udm-domain.workspace = true
+udm-platform.workspace = true
+udm-app.workspace = true
+slint.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+libc.workspace = true
+
+[build-dependencies]
+slint-build.workspace = true
+
+[dev-dependencies]
+i-slint-backend-testing.workspace = true
+
+[lints]
+workspace = true

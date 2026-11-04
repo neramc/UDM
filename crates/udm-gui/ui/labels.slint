@@ -1,0 +1,141 @@
+// Localized labels for every enum shown in the UI.
+
+import { Theme } from "theme.slint";
+import {
+    TransportKind, CapabilityKind, CapabilityState, ReasonCode, AttributeName, ConfidenceLevel,
+    SourceKind, UsageKind, IssueCode, FailureCode, MediaKind, WriteProtectKind, SystemDiskKind,
+    RemovableKind
+} from "types.slint";
+
+export global Labels {
+    public pure function transport(t: TransportKind) -> string {
+        if t == TransportKind.usb { return @tr("USB"); }
+        if t == TransportKind.nvme { return @tr("NVMe"); }
+        if t == TransportKind.ata { return @tr("ATA/SATA"); }
+        if t == TransportKind.scsi { return @tr("SCSI/SAS"); }
+        if t == TransportKind.mmc { return @tr("SD/MMC"); }
+        if t == TransportKind.virtio { return @tr("Virtual (virtio)"); }
+        return @tr("Unknown transport");
+    }
+
+    public pure function capability(c: CapabilityKind) -> string {
+        if c == CapabilityKind.raw-read { return @tr("Raw read"); }
+        if c == CapabilityKind.raw-write { return @tr("Raw write"); }
+        if c == CapabilityKind.safe-eject { return @tr("Safe eject"); }
+        if c == CapabilityKind.smart-access { return @tr("SMART / health data"); }
+        if c == CapabilityKind.partition-edit { return @tr("Partition editing"); }
+        if c == CapabilityKind.secure-erase { return @tr("Secure erase"); }
+        return @tr("Filesystem check");
+    }
+
+    public pure function capability-state(s: CapabilityState) -> string {
+        if s == CapabilityState.supported { return @tr("Supported"); }
+        if s == CapabilityState.limited { return @tr("Limited"); }
+        if s == CapabilityState.unavailable { return @tr("Unavailable"); }
+        return @tr("Not tested");
+    }
+
+    public pure function capability-tone(s: CapabilityState) -> color {
+        if s == CapabilityState.supported { return Theme.tone-positive; }
+        if s == CapabilityState.limited { return Theme.tone-caution; }
+        if s == CapabilityState.unavailable { return Theme.tone-negative; }
+        return Theme.tone-neutral;
+    }
+
+    public pure function reason(r: ReasonCode) -> string {
+        if r == ReasonCode.none { return ""; }
+        if r == ReasonCode.not-assessed { return @tr("Nobody has assessed this capability for this device."); }
+        if r == ReasonCode.not-implemented { return @tr("Not implemented in this build. Phase 0 is read-only."); }
+        if r == ReasonCode.requires-helper { return @tr("Requires the privileged helper."); }
+        if r == ReasonCode.permission-denied { return @tr("Permission denied for the device node."); }
+        if r == ReasonCode.write-protected { return @tr("The device reports write protection."); }
+        if r == ReasonCode.no-media { return @tr("No media is present."); }
+        if r == ReasonCode.transport-unsupported { return @tr("Not available over this transport."); }
+        if r == ReasonCode.bridge-unverified { return @tr("USB bridge pass-through has not been verified."); }
+        return @tr("Overwriting flash memory cannot guarantee physical erasure.");
+    }
+
+    public pure function attribute(a: AttributeName) -> string {
+        if a == AttributeName.vendor { return @tr("Vendor"); }
+        if a == AttributeName.model { return @tr("Model"); }
+        if a == AttributeName.revision { return @tr("Revision"); }
+        if a == AttributeName.serial-number { return @tr("Serial number"); }
+        if a == AttributeName.world-wide-name { return @tr("World Wide Name"); }
+        if a == AttributeName.usb-vendor-id { return @tr("USB vendor ID"); }
+        if a == AttributeName.usb-product-id { return @tr("USB product ID"); }
+        if a == AttributeName.usb-manufacturer { return @tr("USB manufacturer"); }
+        if a == AttributeName.usb-product { return @tr("USB product"); }
+        if a == AttributeName.usb-serial-number { return @tr("USB serial number"); }
+        if a == AttributeName.capacity { return @tr("Reported capacity"); }
+        if a == AttributeName.logical-block-size { return @tr("Logical block size"); }
+        if a == AttributeName.physical-block-size { return @tr("Physical block size"); }
+        if a == AttributeName.persistent-link { return @tr("Persistent link"); }
+        if a == AttributeName.os-device-name { return @tr("OS device name"); }
+        return @tr("OS device number");
+    }
+
+    public pure function confidence(c: ConfidenceLevel) -> string {
+        if c == ConfidenceLevel.high { return @tr("High confidence"); }
+        if c == ConfidenceLevel.medium { return @tr("Medium confidence"); }
+        return @tr("Low confidence");
+    }
+
+    public pure function confidence-tone(c: ConfidenceLevel) -> color {
+        if c == ConfidenceLevel.high { return Theme.tone-positive; }
+        if c == ConfidenceLevel.medium { return Theme.tone-neutral; }
+        return Theme.tone-caution;
+    }
+
+    public pure function source(s: SourceKind) -> string {
+        if s == SourceKind.simulated { return @tr("Simulator"); }
+        if s == SourceKind.linux-sysfs { return @tr("Linux sysfs"); }
+        return @tr("udev link");
+    }
+
+    public pure function usage(u: UsageKind) -> string {
+        if u == UsageKind.mounted { return @tr("Mounted"); }
+        if u == UsageKind.swap { return @tr("Active swap"); }
+        return @tr("Held by");
+    }
+
+    public pure function issue(i: IssueCode) -> string {
+        if i == IssueCode.probe-failed { return @tr("Some information could not be read."); }
+        if i == IssueCode.duplicate-identifier { return @tr("Several devices report the same serial number; it is not used to identify them."); }
+        if i == IssueCode.no-strong-identifier { return @tr("No usable serial number or WWN: this device's identity cannot be confirmed."); }
+        if i == IssueCode.system-disk-undetermined { return @tr("The disk holding the running system could not be determined. All devices are treated as possibly in use by the system."); }
+        return @tr("Virtual block devices (loop, device-mapper, RAID) are not listed.");
+    }
+
+    public pure function failure(f: FailureCode) -> string {
+        if f == FailureCode.not-implemented { return @tr("Device discovery is not implemented for this operating system in this build."); }
+        if f == FailureCode.permission-denied { return @tr("Permission denied while listing storage devices."); }
+        if f == FailureCode.io { return @tr("The list of storage devices could not be read."); }
+        if f == FailureCode.simulated { return @tr("Simulated discovery failure."); }
+        if f == FailureCode.adapter-panicked { return @tr("Device discovery stopped unexpectedly."); }
+        return @tr("The background discovery worker is not running.");
+    }
+
+    public pure function media(m: MediaKind) -> string {
+        if m == MediaKind.present { return @tr("Present"); }
+        if m == MediaKind.no-media { return @tr("No media"); }
+        return @tr("Unknown");
+    }
+
+    public pure function write-protect(w: WriteProtectKind) -> string {
+        if w == WriteProtectKind.writable { return @tr("Not write-protected"); }
+        if w == WriteProtectKind.read-only { return @tr("Write-protected"); }
+        return @tr("Unknown");
+    }
+
+    public pure function system-disk(s: SystemDiskKind) -> string {
+        if s == SystemDiskKind.system { return @tr("Holds the running system"); }
+        if s == SystemDiskKind.not-system { return @tr("Not a system disk"); }
+        return @tr("Unknown (treated as system disk)");
+    }
+
+    public pure function removable(r: RemovableKind) -> string {
+        if r == RemovableKind.yes { return @tr("Yes"); }
+        if r == RemovableKind.no { return @tr("No (as reported; many USB drives report this)"); }
+        return @tr("Not reported");
+    }
+}

@@ -1,0 +1,457 @@
+// Universal Drive Manager — Phase 0 dashboard (read-only).
+
+import { Button, ComboBox, ScrollView, Palette } from "std-widgets.slint";
+import { Theme, ThemeMode } from "theme.slint";
+import { Labels } from "labels.slint";
+import {
+    DeviceItem, IssueRow, ScreenState, FailureCode, SystemDiskKind, RemovableKind
+} from "types.slint";
+import {
+    Badge, SectionTitle, Caption, Body, KeyValue, Card, StateBadges, DeviceCard, CapabilityLine,
+    AttributeLine, UsageText, IssueLine, StateMessage
+} from "components.slint";
+
+export { Theme, ThemeMode, Labels }
+export * from "types.slint";
+
+component Header inherits Rectangle {
+    in-out property <int> source-index;
+    in-out property <int> theme-index;
+    in-out property <int> language-index;
+    in property <bool> busy;
+    callback refresh();
+    callback source-selected(int);
+    callback theme-selected(int);
+    callback language-selected(int);
+
+    background: Theme.surface;
+    height: layout.preferred-height;
+    Rectangle {
+        y: parent.height - self.height;
+        height: Theme.stroke;
+        background: Theme.border;
+    }
+    layout := HorizontalLayout {
+        padding-left: Theme.space-5;
+        padding-right: Theme.space-5;
+        padding-top: Theme.space-3;
+        padding-bottom: Theme.space-3;
+        spacing: Theme.space-4;
+        VerticalLayout {
+            alignment: center;
+            spacing: 2px;
+            Text {
+                text: @tr("Universal Drive Manager");
+                font-size: Theme.font-heading;
+                font-weight: Theme.weight-strong;
+                color: Theme.text-primary;
+            }
+            Caption { text: @tr("Phase 0 prototype · read-only"); }
+        }
+        Rectangle { horizontal-stretch: 1; }
+        VerticalLayout {
+            alignment: center;
+            spacing: 2px;
+            Caption { text: @tr("Data source"); }
+            ComboBox {
+                min-width: 260px;
+                model: [
+                    @tr("Simulated: sample devices"),
+                    @tr("Simulated: no devices"),
+                    @tr("Simulated: discovery failure"),
+                    @tr("Simulated: hot-plug sequence"),
+                    @tr("This computer (read-only)"),
+                ];
+                current-index <=> root.source-index;
+                accessible-label: @tr("Data source");
+                selected => { root.source-selected(self.current-index); }
+            }
+        }
+        VerticalLayout {
+            alignment: end;
+            Button {
+                text: root.busy ? @tr("Refreshing…") : @tr("Refresh");
+                enabled: !root.busy;
+                accessible-description: @tr("Discover devices again");
+                clicked => { root.refresh(); }
+            }
+        }
+        VerticalLayout {
+            alignment: center;
+            spacing: 2px;
+            Caption { text: @tr("Theme"); }
+            ComboBox {
+                min-width: 120px;
+                model: [@tr("System"), @tr("Light"), @tr("Dark")];
+                current-index <=> root.theme-index;
+                accessible-label: @tr("Theme");
+                selected => { root.theme-selected(self.current-index); }
+            }
+        }
+        VerticalLayout {
+            alignment: center;
+            spacing: 2px;
+            Caption { text: @tr("Language"); }
+            ComboBox {
+                min-width: 120px;
+                // Language names are always shown in their own language.
+                model: ["English", "한국어"];
+                current-index <=> root.language-index;
+                accessible-label: @tr("Language");
+                selected => { root.language-selected(self.current-index); }
+            }
+        }
+    }
+}
+
+component Notice inherits Rectangle {
+    in property <bool> simulated;
+    background: Theme.tone-info.transparentize(0.9);
+    height: layout.preferred-height;
+    accessible-role: AccessibleRole.text;
+    accessible-label: notice-text.text;
+    layout := HorizontalLayout {
+        padding-left: Theme.space-5;
+        padding-right: Theme.space-5;
+        padding-top: Theme.space-2;
+        padding-bottom: Theme.space-2;
+        spacing: Theme.space-2;
+        notice-text := Text {
+            text: (root.simulated
+                ? @tr("Showing simulated devices. They do not exist and their capabilities are illustrative.")
+                : @tr("Showing devices of this computer, discovered read-only."))
+                + " " + @tr("This build cannot write, format, partition or erase any device.");
+            color: Theme.text-primary;
+            font-size: Theme.font-body;
+            wrap: word-wrap;
+            accessible-role: AccessibleRole.none;
+        }
+    }
+}
+
+component DeviceList inherits Rectangle {
+    in property <[DeviceItem]> devices;
+    in property <ScreenState> state;
+    in property <FailureCode> failure;
+    in property <string> failure-detail;
+    in property <bool> system-source;
+    in-out property <int> selected-index;
+    callback retry();
+
+    background: Theme.canvas;
+    accessible-role: list;
+    accessible-label: @tr("Devices");
+
+    list-focus := FocusScope {
+        key-pressed(event) => {
+            if root.devices.length == 0 { return reject; }
+            if event.text == Key.DownArrow {
+                root.selected-index = Math.min(root.selected-index + 1, root.devices.length - 1);
+                return accept;
+            }
+            if event.text == Key.UpArrow {
+                root.selected-index = Math.max(root.selected-index - 1, 0);
+                return accept;
+            }
+            if event.text == Key.Home {
+                root.selected-index = 0;
+                return accept;
+            }
+            if event.text == Key.End {
+                root.selected-index = root.devices.length - 1;
+                return accept;
+            }
+            return reject;
+        }
+    }
+
+    if root.state == ScreenState.loading && root.devices.length == 0: StateMessage {
+        title: @tr("Discovering devices…");
+        body: @tr("Discovery runs in the background and never writes to a device.");
+    }
+    if root.state == ScreenState.failed: StateMessage {
+        title: @tr("Devices could not be listed");
+        body: Labels.failure(root.failure) + (root.failure-detail != "" ? "\n" + root.failure-detail : "");
+        HorizontalLayout {
+            alignment: center;
+            Button {
+                text: @tr("Try again");
+                clicked => { root.retry(); }
+            }
+        }
+    }
+    if root.state == ScreenState.ready && root.devices.length == 0: StateMessage {
+        title: @tr("No storage devices found");
+        body: root.system-source
+            ? @tr("Connect a device and select Refresh. Virtual devices such as loop devices are not listed.")
+            : @tr("The selected simulated scenario contains no devices.");
+    }
+    if root.state != ScreenState.failed && root.devices.length > 0: list-scroll := ScrollView {
+        // Content always fits the visible width; only vertical scrolling.
+        content-width: self.visible-width;
+        content-height: list-layout.preferred-height;
+        list-layout := VerticalLayout {
+            width: list-scroll.visible-width;
+            padding: Theme.space-3;
+            spacing: Theme.space-2;
+            alignment: start;
+            for device[index] in root.devices: DeviceCard {
+                device: device;
+                selected: index == root.selected-index;
+                list-focused: list-focus.has-focus;
+                activated => {
+                    root.selected-index = index;
+                    list-focus.focus();
+                }
+            }
+        }
+    }
+}
+
+component DeviceDetail inherits Rectangle {
+    in property <DeviceItem> device;
+    background: Theme.canvas;
+
+    detail-scroll := ScrollView {
+        content-width: self.visible-width;
+        content-height: detail-layout.preferred-height;
+        detail-layout := VerticalLayout {
+            width: detail-scroll.visible-width;
+            padding: Theme.space-5;
+            spacing: Theme.space-4;
+            alignment: start;
+
+            // Title
+            VerticalLayout {
+                spacing: Theme.space-2;
+                HorizontalLayout {
+                    spacing: Theme.space-3;
+                    Text {
+                        horizontal-stretch: 1;
+                        text: root.device.title != "" ? root.device.title : @tr("Unidentified device");
+                        font-size: Theme.font-heading;
+                        font-weight: Theme.weight-strong;
+                        color: Theme.text-primary;
+                        wrap: word-wrap;
+                    }
+                    Text {
+                        text: root.device.capacity != "" ? root.device.capacity : @tr("Size unknown");
+                        font-size: Theme.font-heading;
+                        color: Theme.text-secondary;
+                    }
+                }
+                StateBadges { device: root.device; }
+                if root.device.capacity-detail != "": Caption { text: root.device.capacity-detail; }
+            }
+
+            if root.device.simulated: Card {
+                background: Theme.tone-info.transparentize(0.9);
+                border-color: Theme.tone-info.transparentize(0.6);
+                HorizontalLayout {
+                    padding: Theme.space-3;
+                    Body { text: @tr("Simulated device. It does not exist; its identity and capabilities illustrate how real hardware situations are represented."); }
+                }
+            }
+
+            // State
+            Card {
+                VerticalLayout {
+                    padding: Theme.space-4;
+                    spacing: Theme.space-2;
+                    SectionTitle { text: @tr("Device state"); }
+                    KeyValue { label: @tr("Media"); value: Labels.media(root.device.media); }
+                    KeyValue { label: @tr("Write protection"); value: Labels.write-protect(root.device.write-protect); }
+                    KeyValue { label: @tr("Removable"); value: Labels.removable(root.device.removable); }
+                    KeyValue {
+                        label: @tr("System disk");
+                        value: Labels.system-disk(root.device.system-disk);
+                        value-color: root.device.system-disk == SystemDiskKind.not-system ? Theme.text-primary : Theme.tone-caution;
+                    }
+                    KeyValue { label: @tr("In use"); value: root.device.in-use ? @tr("Yes: mounted, swap or held") : @tr("No usage detected"); }
+                    KeyValue { label: @tr("Block size"); value: root.device.block-size != "" ? root.device.block-size : @tr("Not reported"); }
+                }
+            }
+
+            // Partitions and usage
+            Card {
+                VerticalLayout {
+                    padding: Theme.space-4;
+                    spacing: Theme.space-2;
+                    SectionTitle { text: @tr("Partitions"); }
+                    for usage in root.device.whole-disk-usage: UsageText { item: usage; }
+                    if root.device.partitions.length == 0: Caption {
+                        text: @tr("No partitions reported. Contents are not inspected in this build.");
+                    }
+                    for partition in root.device.partitions: HorizontalLayout {
+                        spacing: Theme.space-3;
+                        Text {
+                            width: Theme.label-column;
+                            text: @tr("Partition {}", partition.number) + (partition.os-name != "" ? " · " + partition.os-name : "");
+                            color: Theme.text-secondary;
+                            font-size: Theme.font-body;
+                        }
+                        VerticalLayout {
+                            horizontal-stretch: 1;
+                            spacing: 2px;
+                            Body { text: partition.size + (partition.start != "" ? "  ·  " + @tr("starts at {}", partition.start) : ""); }
+                            if partition.usage.length == 0: Caption { text: @tr("No usage detected"); }
+                            for usage in partition.usage: UsageText { item: usage; }
+                        }
+                    }
+                }
+            }
+
+            // Capabilities
+            Card {
+                VerticalLayout {
+                    padding: Theme.space-4;
+                    spacing: Theme.space-1;
+                    SectionTitle { text: @tr("Capabilities"); }
+                    Caption {
+                        text: @tr("Every operation has an explicit status. \"Not tested\" never means supported. * marks operations that can destroy data.");
+                    }
+                    for row in root.device.capabilities: CapabilityLine { entry: row; }
+                }
+            }
+
+            // Identity
+            Card {
+                VerticalLayout {
+                    padding: Theme.space-4;
+                    spacing: Theme.space-1;
+                    SectionTitle { text: @tr("Identity evidence"); }
+                    Caption {
+                        text: root.device.strong-identity
+                            ? @tr("A serial number or WWN is available. Device paths are never used as identity.")
+                            : @tr("No reliable serial number or WWN. This device cannot be told apart from an identical one; future destructive operations will require extra confirmation.");
+                    }
+                    for row in root.device.attributes: AttributeLine { entry: row; }
+                }
+            }
+
+            if root.device.issues.length > 0: Card {
+                VerticalLayout {
+                    padding: Theme.space-4;
+                    spacing: Theme.space-2;
+                    SectionTitle { text: @tr("Discovery notes"); }
+                    for issue in root.device.issues: IssueLine { entry: issue; }
+                }
+            }
+        }
+    }
+}
+
+export component MainWindow inherits Window {
+    title: @tr("Universal Drive Manager");
+    preferred-width: 1240px;
+    preferred-height: 820px;
+    min-width: 960px;
+    min-height: 600px;
+    background: Theme.canvas;
+    default-font-size: Theme.font-body;
+
+    in property <[DeviceItem]> devices;
+    in-out property <int> selected-index: -1;
+    in property <ScreenState> state: ScreenState.loading;
+    in property <FailureCode> failure: FailureCode.io;
+    in property <string> failure-detail;
+    in property <bool> source-simulated: true;
+    in property <string> refresh-summary;
+    in property <[IssueRow]> global-issues;
+    in-out property <int> source-index: 0;
+    in-out property <int> theme-index: 0;
+    in-out property <int> language-index: 0;
+
+    callback refresh();
+    callback source-changed(int);
+    callback language-changed(int);
+
+    public function apply-theme(index: int) {
+        root.theme-index = index;
+        Palette.color-scheme = index == 1 ? ColorScheme.light : index == 2 ? ColorScheme.dark : ColorScheme.unknown;
+    }
+
+    VerticalLayout {
+        Header {
+            source-index <=> root.source-index;
+            theme-index <=> root.theme-index;
+            language-index <=> root.language-index;
+            busy: root.state == ScreenState.loading;
+            refresh => { root.refresh(); }
+            source-selected(index) => { root.source-changed(index); }
+            theme-selected(index) => { root.apply-theme(index); }
+            language-selected(index) => { root.language-changed(index); }
+        }
+        Notice { simulated: root.source-simulated; }
+
+        HorizontalLayout {
+            vertical-stretch: 1;
+            VerticalLayout {
+                width: Theme.sidebar-width;
+                HorizontalLayout {
+                    padding-left: Theme.space-4;
+                    padding-right: Theme.space-4;
+                    padding-top: Theme.space-3;
+                    spacing: Theme.space-2;
+                    SectionTitle { text: @tr("Devices"); }
+                    if root.state != ScreenState.failed: Badge { text: root.devices.length; }
+                    Rectangle { horizontal-stretch: 1; }
+                }
+                DeviceList {
+                    vertical-stretch: 1;
+                    devices: root.devices;
+                    state: root.state;
+                    failure: root.failure;
+                    failure-detail: root.failure-detail;
+                    system-source: !root.source-simulated;
+                    selected-index <=> root.selected-index;
+                    retry => { root.refresh(); }
+                }
+                if root.global-issues.length > 0: Rectangle {
+                    background: Theme.surface-sunken;
+                    height: issues-layout.preferred-height;
+                    issues-layout := VerticalLayout {
+                        padding: Theme.space-4;
+                        spacing: Theme.space-2;
+                        Caption { text: @tr("Discovery notes"); font-weight: Theme.weight-strong; }
+                        for issue in root.global-issues: IssueLine { entry: issue; }
+                    }
+                }
+            }
+            Rectangle { width: Theme.stroke; background: Theme.border; }
+            if root.selected-index >= 0 && root.selected-index < root.devices.length: DeviceDetail {
+                horizontal-stretch: 1;
+                device: root.devices[root.selected-index];
+            }
+            if !(root.selected-index >= 0 && root.selected-index < root.devices.length): Rectangle {
+                horizontal-stretch: 1;
+                StateMessage {
+                    title: @tr("No device selected");
+                    body: @tr("Select a device to see its state, partitions, capabilities and identity evidence.");
+                }
+            }
+        }
+
+        // Status bar
+        Rectangle {
+            height: status.preferred-height;
+            background: Theme.surface;
+            Rectangle { y: 0; height: Theme.stroke; background: Theme.border; }
+            status := HorizontalLayout {
+                padding-left: Theme.space-5;
+                padding-right: Theme.space-5;
+                padding-top: Theme.space-1 + 2px;
+                padding-bottom: Theme.space-1 + 2px;
+                spacing: Theme.space-3;
+                Caption {
+                    text: root.state == ScreenState.loading ? @tr("Discovering…")
+                        : root.state == ScreenState.failed ? @tr("Discovery failed")
+                        : @tr("Discovery complete");
+                    accessible-role: AccessibleRole.text;
+                }
+                Caption { text: root.refresh-summary; horizontal-stretch: 1; }
+                Caption { text: @tr("No telemetry is collected."); }
+            }
+        }
+    }
+}

@@ -1,0 +1,18 @@
+[package]
+name = "udm-platform"
+description = "Platform adapters for Universal Drive Manager: simulated devices and read-only OS device discovery."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[dependencies]
+udm-domain.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+udm-testkit.workspace = true
+
+[lints]
+workspace = true
