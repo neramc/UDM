@@ -1,0 +1,62 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/udm-domain",
+    "crates/udm-platform",
+    "crates/udm-app",
+    "crates/udm-gui",
+    "crates/udm-testkit",
+]
+
+[workspace.package]
+version = "0.0.1"
+edition = "2024"
+rust-version = "1.92"
+publish = false
+# NOTE: The project license has not been chosen yet. See docs/ADR/0002-gui-toolkit-slint.md
+# and docs/PHASE0_TEST_REPORT.md ("Unresolved questions"). Do not add a `license` field
+# until the project owner decides.
+
+[workspace.dependencies]
+udm-domain = { path = "crates/udm-domain" }
+udm-platform = { path = "crates/udm-platform" }
+udm-app = { path = "crates/udm-app" }
+udm-testkit = { path = "crates/udm-testkit" }
+
+thiserror = "2.0.17"
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.20", default-features = false, features = ["fmt", "env-filter", "ansi", "std"] }
+tempfile = "3.20"
+libc = "0.2.170"
+
+# Slint is pinned to an exact version because the headless testing backend
+# (`i-slint-backend-testing`) does not follow semver and must match exactly.
+slint = { version = "=1.18.1", default-features = false, features = [
+    "std",
+    "backend-winit",
+    "renderer-femtovg",
+    "renderer-software",
+    "accessibility",
+    "compat-1-2",
+] }
+slint-build = "=1.18.1"
+i-slint-backend-testing = "=1.18.1"
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+missing_debug_implementations = "warn"
+unreachable_pub = "warn"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "warn"
+dbg_macro = "warn"
+todo = "warn"
+cast_possible_truncation = "warn"
+cast_sign_loss = "warn"
+
+[profile.dev.package."*"]
+# Speed up the GUI in debug builds without slowing down incremental builds of our crates.
+opt-level = 2
