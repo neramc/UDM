@@ -81,7 +81,7 @@ without the fix and pass with it**.
 
 | Item | Status |
 |------|--------|
-| Windows (build, tests, GUI, discovery) | **Not tested** — no Windows host available. CI job configured; results only valid once observed. Discovery is not implemented and reports `NotImplemented`. |
+| Windows (build, tests, GUI, discovery) | **Not tested** — no Windows host available. CI job configured, but after pushing, the GitHub API listed **0 workflow runs** for the repository (Actions may be disabled for it), so no Windows result exists. Discovery is not implemented and reports `NotImplemented`. |
 | macOS (build, tests, GUI, discovery) | **Not tested** — same as Windows. |
 | Linux with real USB / NVMe / SD hardware, udev by-id links | **Not tested** — only fake sysfs trees and virtio disks. |
 | Linux Wayland session, real GPU renderer | Not tested. |
@@ -131,7 +131,8 @@ without the fix and pass with it**.
 
 ## 10. Remaining Phase 0 / next steps
 
-1. Observe the CI run on Windows and macOS and record the results here.
+1. Enable GitHub Actions for the repository (if disabled), observe the CI
+   run on Windows and macOS, and record the results here.
 2. Windows and macOS read-only discovery prototypes on real machines.
 3. ADR-0005/0006 design review before any destructive feature.
 4. Missing project documents required by CLAUDE.md: `docs/PRD.md`,
