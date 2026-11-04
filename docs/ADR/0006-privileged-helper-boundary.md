@@ -1,8 +1,12 @@
 # ADR-0006: Privileged helper process boundary
 
-- Status: **Proposed** — design only. No helper exists in Phase 0, and the
-  GUI refuses to start with root/administrator privileges.
+- Status: **Accepted** (design approved by the project owner on 2026-11-04)
 - Date: 2026-11-04
+- Scope of acceptance: the process boundary, protocol rules and
+  revalidation requirement are binding. The per-OS mechanisms in item 4 are
+  the intended direction and must be confirmed by prototypes; deviations
+  need an ADR update. No helper exists yet, and the GUI keeps refusing to
+  start with root privileges.
 
 ## Context
 
@@ -11,7 +15,7 @@ privileges. CLAUDE.md forbids running the whole GUI elevated and forbids
 arbitrary command execution. Each OS offers different elevation mechanisms
 (see `docs/PLATFORM_SUPPORT.md`).
 
-## Decision (proposed)
+## Decision
 
 1. A separate executable `udm-helper` performs only privileged operations.
    The GUI and application layer run unprivileged.
@@ -46,7 +50,7 @@ Confused deputy (helper writing to a device the user did not authorize),
 privilege escalation via crafted requests, TOCTOU between authorization and
 execution. See `docs/THREAT_MODEL.md`.
 
-## Open questions
+## Open questions (to resolve during implementation)
 
 - Exact authentication of the GUI to the helper on each OS (peer credentials
   on Unix sockets / D-Bus sender, named-pipe client PID and token on Windows,

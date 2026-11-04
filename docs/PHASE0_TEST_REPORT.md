@@ -1,6 +1,6 @@
 # Phase 0 Test Report
 
-Date: 2026-11-04 · Branch: `code/ecstatic-noether-6rz2w3`
+Date: 2026-11-04 (updated after the license decision and ADR-0005/0006 acceptance) · Branch: `code/ecstatic-noether-6rz2w3`
 
 Only results that were actually executed and observed are reported as
 passing. Platforms that were not available are listed as untested.
@@ -21,8 +21,10 @@ passing. Platforms that were not available are listed as untested.
 |---------|--------|
 | `cargo fmt --all --check` | Pass |
 | `cargo clippy --workspace --all-targets --locked -- -D warnings` | Pass (0 warnings; Slint build-script warnings also 0 after replacing deprecated `viewport-*` properties) |
-| `cargo test --workspace --locked` | **110 passed, 0 failed, 0 ignored** |
-| `python3 -I tools/update_po.py` | 131 strings, 131 translated |
+| `cargo test --workspace --locked` | **112 passed, 0 failed, 0 ignored** |
+| `python3 -I tools/update_po.py` | 141 strings, 141 translated |
+| `cargo deny check` (cargo-deny 0.20.2; Linux, Windows, macOS targets) | `advisories ok, bans ok, licenses ok, sources ok` (warnings only for duplicate transitive crate versions) |
+| SPDX header check (all `.rs`, `.slint`, `.py`, `.toml`, workflow files) | Every file has `SPDX-License-Identifier: GPL-3.0-or-later` |
 
 Per crate:
 
@@ -33,7 +35,7 @@ Per crate:
 | `udm-app` | 10 | discovery off the caller thread, `request_refresh` < 100 ms with a 500 ms adapter, coalescing, epochs, adapter errors surfaced, adapter panic contained, drop does not hang on a 30 s stuck adapter (bounded by 2 s grace) |
 | `udm-testkit` | 28 | sparse 16 GiB virtual disk uses < 1 MiB, never grows past capacity, MBR/GPT structure and CRC32, 512 B and 4 KiB sectors, fault injection (range errors, short I/O, corruption, flush failure, disconnect mid-transfer), pattern verification across chunk boundaries |
 | `udm-gui` (unit) | 6 | SI/IEC formatting incl. rounding carry (999,999,999 B → 1.0 GB), digit grouping, titles never invented, failure/issue mapping |
-| `udm-gui` (headless UI) | 10 | simulated labels on all cards, all four capability states rendered, failure ≠ empty ≠ loading, stale-epoch results ignored, selection dropped when the device under a key changes, Up/Down/Home/End navigation, no destructive buttons, theme switching, Korean bundle |
+| `udm-gui` (headless UI) | 12 | simulated labels on all cards, all four capability states rendered, failure ≠ empty ≠ loading, stale-epoch results ignored, selection dropped when the device under a key changes, Up/Down/Home/End navigation, no destructive buttons, theme switching, Korean bundle, About dialog GPL notices + Escape/Close |
 
 ## 3. Independent validation of virtual-disk fixtures (executed)
 
@@ -75,6 +77,7 @@ without the fix and pass with it**.
 | "Simulated: discovery failure" | Explicit failure state with "Try again"; log `discovery pass failed … simulated discovery failure` |
 | "This computer (read-only)" | 6 virtio devices; `vda` shows "Holds the running system" |
 | Layout defect found in the run | Cards overflowed the sidebar (scroll view sized to content); fixed by binding content width to visible width; identity provenance column misaligned; fixed with a fixed-width column |
+| About dialog (GPLv3 Appropriate Legal Notices) | Opens from the header; shows version 0.0.1 and repository URL from Cargo metadata, copyright, no-warranty text, license location; Escape closes it (screen pixel-identical to before opening) |
 | GUI responsiveness | Discovery always runs on the `udm-discovery` thread (unit-tested); a 250 ms simulated latency shows the loading state without blocking input |
 
 ## 6. Untested platforms and features
@@ -97,8 +100,8 @@ without the fix and pass with it**.
   designed in `PLATFORM_SUPPORT.md` and remain explicit `NotImplemented`.
 - No physical removable devices → USB/SD/NVMe behaviour on real hardware
   unverified.
-- Project license not chosen → Slint license option and About-dialog
-  obligation open (ADR-0002).
+- ~~Project license not chosen~~ — resolved: GPL-3.0-or-later, Slint under
+  GPL-3.0-only (ADR-0002 accepted).
 
 ## 8. Unresolved technical risks
 
@@ -117,9 +120,10 @@ without the fix and pass with it**.
 
 ## 9. Unresolved questions (licensing, packaging, accessibility, security)
 
-- **Licensing**: project license (GPL-3.0 vs permissive + Slint
-  Royalty-free attribution); dependency license audit with `cargo deny`;
-  font licensing if fonts are bundled for CJK.
+- **Licensing**: resolved — GPL-3.0-or-later; `cargo deny` license policy in
+  place. Still open: generating third-party license notices for release
+  packages (MIT/BSD/Apache notice requirements) and font licensing if fonts
+  are ever bundled for CJK.
 - **Packaging**: formats per OS (AppImage/deb/rpm/Flatpak, MSI/MSIX,
   notarized DMG); how the privileged helper is installed and updated;
   code-signing for an open-source project.
@@ -129,14 +133,25 @@ without the fix and pass with it**.
   system-disk status may ever be overridden; root-only rescue systems;
   Windows elevation detection for the GUI.
 
-## 10. Remaining Phase 0 / next steps
+## 10. Status of decisions and next steps
+
+Decided on 2026-11-04 by the project owner:
+
+- License: GPL-3.0-or-later (ADR-0002 accepted; `LICENSE`, SPDX headers,
+  About dialog, `deny.toml`).
+- ADR-0005 (operation planning) and ADR-0006 (privileged helper) accepted as
+  binding designs. No destructive operation is implemented or enabled.
+- `docs/PRD.md`, `SECURITY.md` and `CONTRIBUTING.md` written.
+
+Next steps:
 
 1. Enable GitHub Actions for the repository (if disabled), observe the CI
-   run on Windows and macOS, and record the results here.
-2. Windows and macOS read-only discovery prototypes on real machines.
-3. ADR-0005/0006 design review before any destructive feature.
-4. Missing project documents required by CLAUDE.md: `docs/PRD.md`,
-   `SECURITY.md`, `CONTRIBUTING.md` (need owner input on scope, contact and
-   process).
-5. About dialog (license-dependent), renderer fallback, uevent-based
-   hot-plug refresh on Linux.
+   run on Windows and macOS (including the cargo-deny job), and record the
+   results here.
+2. Enable GitHub private vulnerability reporting, which `SECURITY.md` points
+   to (repository Settings → Security).
+3. Phase 1 (PRD §8): Windows and macOS read-only discovery prototypes on
+   real machines; helper protocol crate with a fake helper; job engine and
+   operation-planning typestate against virtual disks only.
+4. Third-party license notices for release packages; renderer fallback;
+   uevent-based hot-plug refresh on Linux.

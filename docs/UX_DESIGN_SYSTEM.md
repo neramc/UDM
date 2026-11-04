@@ -69,7 +69,8 @@ test environment).
 
 Spacing scale 4 / 8 / 12 / 16 / 24 / 32 px (`space-1` … `space-6`); radii
 4 px (badges) and 8 px (cards); 1 px stroke, 2 px focus stroke; elevation by
-borders, not shadows. Layout constants: sidebar 360 px, label column 168 px,
+borders, not shadows, except dialogs (`scrim`, `dialog-shadow`,
+`dialog-shadow-blur` 24 px). Layout constants: sidebar 360 px, label column 168 px,
 provenance column 220 px.
 
 ### Themes
@@ -90,6 +91,7 @@ resolved palette so custom tokens and std-widgets always agree.
 | AttributeLine | Identity attribute, value, provenance, confidence badge | text |
 | IssueLine | Discovery note; caution bar for warnings, neutral for info | text |
 | StateMessage | Loading / empty / failure / nothing selected | text; failure has "Try again" button |
+| AboutDialog | Version, GPLv3 legal notices, license location, source URL | modal overlay with scrim; Escape or "Close" dismisses; focus moves into the dialog |
 
 ## 4. Designed states
 
@@ -116,7 +118,6 @@ question).
 
 ## 6. Open UX questions
 
-- About dialog with `AboutSlint` (license dependent, ADR-0002).
 - Screen-reader verification (Orca, Narrator, VoiceOver) has not been done;
   only the accessibility tree was inspected via the testing backend.
 - Locale-aware number formatting.

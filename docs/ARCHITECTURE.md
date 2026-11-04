@@ -114,19 +114,25 @@ Planned per-OS designs are in [`PLATFORM_SUPPORT.md`](PLATFORM_SUPPORT.md).
 - `src/view_model.rs`: domain → view-model conversion and formatting
   (SI and IEC units, digit grouping) — unit-tested.
 - `src/presenter.rs`: applies events, epoch filtering, safe selection.
+- `ui/about.slint`: About dialog with the GPLv3 "Appropriate Legal
+  Notices" (ADR-0002).
 - `src/main.rs`: startup, refuses to run as root (Unix), logging
-  (`UDM_LOG`), language selection (`UDM_LANG`/`LANG`), wiring.
+  (`UDM_LOG`), language selection (`UDM_LANG`/`LANG`), version and source
+  URL from Cargo metadata, wiring.
 - Translations: `lang/ko/LC_MESSAGES/udm-gui.po`, bundled at build time.
 
 ## 7. Designed, not implemented
 
-- Operation planning with typestate and revalidation — ADR-0005.
-- Privileged helper with a narrow, versioned protocol — ADR-0006.
+- Operation planning with typestate and revalidation — ADR-0005 (accepted).
+- Privileged helper with a narrow, versioned protocol — ADR-0006 (accepted).
 - Job engine with stages, progress, cancellation and verification — ADR-0007
   consequences.
 - Persistence (SQLite history), image I/O, hashing, benchmarking, reports.
 
 ## 8. Cross-cutting rules
+
+- License: GPL-3.0-or-later with SPDX headers; dependencies restricted to
+  GPLv3-compatible licenses by `deny.toml` (ADR-0002).
 
 - `unsafe_code = "deny"` workspace-wide; one documented exception
   (`geteuid`).

@@ -68,6 +68,7 @@ cargo test --workspace
 cargo run -p udm-platform --example discover            # read-only, redacts serials
 cargo run -p udm-testkit --example write_fixtures -- <new-dir>
 python3 -I tools/update_po.py                            # Korean catalog; fails on missing strings
+cargo deny check                                         # dependency licenses (GPLv3-compatible) and advisories
 ```
 
 Running the GUI headless (Linux):

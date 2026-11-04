@@ -1,9 +1,12 @@
 # ADR-0005: Typed operation plans and revalidation
 
-- Status: **Proposed** — design only. Nothing in Phase 0 implements or
-  executes a destructive operation. Requires a separate design review before
-  any implementation.
+- Status: **Accepted** (design approved by the project owner on 2026-11-04)
 - Date: 2026-11-04
+- Scope of acceptance: this ADR is the binding design for operation
+  planning. It does not by itself enable any destructive operation on a
+  physical device: each operation still needs its implementation, tests
+  (virtual disks, fault injection, revalidation failures) and a review of
+  its concrete confirmation UI before it is enabled (CLAUDE.md §14).
 
 ## Context
 
@@ -12,7 +15,7 @@ CLAUDE.md §4 defines a ten-step lifecycle for destructive operations
 execute → handle failure → flush/verify → persist). The type system should
 make skipping a step impossible rather than merely discouraged.
 
-## Decision (proposed)
+## Decision
 
 ### Plan lifecycle as typestate
 
@@ -45,9 +48,9 @@ impl OperationPlan<Authorized> { fn revalidate(self, fresh: &Device) -> Result<O
 
 ### Policy checks (in `validate` and again in `revalidate`)
 
-- Target is not a system disk; `SystemDiskStatus::Unknown` is treated as a
-  system disk unless the person overrides explicitly with a separate,
-  clearly worded confirmation (open question: whether to allow at all).
+- Target is not a system disk. `SystemDiskStatus::Unknown` is treated as a
+  system disk. **The first implementation offers no override**; allowing one
+  (e.g. for rescue systems) requires a separate ADR.
 - No partition is mounted, active swap, or held by device-mapper/RAID, unless
   the operation itself unmounts through the platform adapter with consent.
 - Capability for the operation is `Supported` or `Limited` (with the

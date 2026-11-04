@@ -1,6 +1,6 @@
 # Threat Model
 
-Status: Phase 0 draft (2026-11-04). Phase 0 performs read-only discovery
+Status: Phase 0 (2026-11-04); ADR-0005 and ADR-0006 accepted. Phase 0 performs read-only discovery
 only; most threats below concern later phases and drive design decisions now.
 
 ## 1. Assets
@@ -43,7 +43,7 @@ root on Unix.
 |---|--------|----------------|----------------------------------|
 | T1 | **Wrong target**: writing to a different device than authorized (path reuse after replug, index shift) | No writes exist | Identity model (ADR-0003): paths never identity; `compare` requires strong identifier + capacity. Planned: revalidation immediately before execution and inside the helper (ADR-0005/0006); abort on `Mismatch`; never redirect. UI never auto-selects a destructive target; selection is dropped if the device under a key changes (implemented). |
 | T2 | **Identical devices** with duplicated or placeholder serials | Implemented detection | Duplicates downgraded to Low and reported; placeholder serials Low; `NoStrongIdentifier` warning; planned extra confirmation for `Inconclusive`. |
-| T3 | **Destroying the running system** | Detection implemented | System disk detection through holders (LUKS/LVM/RAID); `Unknown` when undeterminable, never "not system". Planned: planner refuses system/Unknown targets by default. |
+| T3 | **Destroying the running system** | Detection implemented | System disk detection through holders (LUKS/LVM/RAID); `Unknown` when undeterminable, never "not system". Accepted design (ADR-0005): the planner refuses system and `Unknown` targets, with no override in the first implementation. |
 | T4 | **TOCTOU** between confirmation and execution | Design | Typestate plan; revalidate right before execution and again in the helper; exclusive open (`O_EXCL` on Linux block devices, volume lock/dismount on Windows, DiskArbitration claim/unmount on macOS — to be verified per OS). |
 | T5 | **Privilege escalation via helper** (crafted IPC, command injection) | No helper | Closed request set, no command/paths-to-executables, size limits, version check, peer authentication, helper revalidates everything (ADR-0006). No shell execution anywhere (policy; no `std::process::Command` in the workspace). |
 | T6 | **Running the whole GUI elevated** | Enforced on Unix | `geteuid() == 0` → refuse with exit code 2. Windows elevation check not implemented (documented gap). |
@@ -53,7 +53,7 @@ root on Unix.
 | T10 | **Misleading capability or health claims** (e.g. "secure erase" on flash, "healthy" when SMART unavailable) | Implemented model | Four-state capabilities with reasons; `FlashErasureNotGuaranteed`; unassessed = Not tested; UI legend says Not tested ≠ supported. |
 | T11 | **Leaking personal data** (serials, user names in mount paths) via logs | Partially | Sensitive attribute kinds flagged; app layer logs counts only; discovery example redacts by default. Planned: redaction helpers for diagnostic reports; no telemetry. |
 | T12 | **GUI freeze / denial of service** by hung device I/O | Implemented for discovery | Discovery on a worker; non-blocking commands; bounded queue; shutdown does not hang on stuck read-only worker. |
-| T13 | **Supply chain** | Partially | Few dependencies; Slint pinned exactly. Planned: `cargo deny` (licenses, advisories), `Cargo.lock` committed, CI on three OSes. |
+| T13 | **Supply chain** | Partially | Few direct dependencies; Slint pinned exactly; `Cargo.lock` committed; `cargo deny check` (RustSec advisories, GPLv3-compatible licenses, crates.io only) passes and runs in CI. Planned: reproducible release builds, signed releases. |
 | T14 | **Recovery source modified** during recovery imaging | N/A | Planned: recovery sources opened read-only by default; writes to a source require a distinct, explicit flow (CLAUDE.md rule 8). |
 | T15 | **Fake-capacity flash** (device reports more capacity than it has) | N/A | Planned: verification by pattern write/read over the full range before trusting capacity; harness has deterministic position-dependent patterns. |
 
@@ -67,8 +67,9 @@ root on Unix.
 
 ## 6. Open questions
 
-1. Should `SystemDiskStatus::Unknown` ever be overridable, e.g. on live/rescue
-   systems where everything may look like a system disk?
+1. ~~Should `SystemDiskStatus::Unknown` be overridable?~~ Decided in
+   ADR-0005 (accepted): no override in the first implementation; a future
+   override (e.g. for rescue systems) needs its own ADR.
 2. Policy for running under root on rescue distributions that only provide a
    root session (currently: refuse).
 3. Windows elevation detection and UAC-based helper launch — security review
